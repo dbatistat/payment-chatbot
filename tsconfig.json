@@ -10,9 +10,5 @@
     "outDir": "./dist",
     "baseUrl": "./"
   },
-  "exclude": ["node_modules"],
-  "include":[
-    "*.ts",
-    "**/*.d.ts"
-  ]
+  "exclude": ["node_modules"]
 }
