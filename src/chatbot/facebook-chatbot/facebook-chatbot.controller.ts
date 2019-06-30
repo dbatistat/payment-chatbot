@@ -3,7 +3,7 @@ import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
 import { FacebookMessageDto } from './dto/FacebookMessage.dto';
 import { FacebookChatbotService } from './facebook-chatbot.service';
 
-@Controller('facebook_chatbot')
+@Controller('webhook')
 export class FacebookChatbotController {
 
   constructor(private service: FacebookChatbotService) {
