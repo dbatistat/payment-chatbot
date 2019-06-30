@@ -83,8 +83,11 @@ export class FacebookChatbotService {
       };
     }
 
-    // Send the response message
-    this.sendApi(senderPsid, response);
+    this.sendApi(senderPsid, response).then(res => {
+      Logger.log(res, 'API_FACEBOOK');
+    }).catch(error => {
+      Logger.log(error, 'API_FACEBOOK');
+    });
   }
 
   async handlePostback(senderPsid, receivedPostback) {
@@ -98,7 +101,11 @@ export class FacebookChatbotService {
       response = { text: 'Oops, try sending another image.' };
     }
 
-    this.sendApi(senderPsid, response);
+    this.sendApi(senderPsid, response).then(res => {
+      Logger.log(res, 'API_FACEBOOK');
+    }).catch(error => {
+      Logger.log(error, 'API_FACEBOOK');
+    });
   }
 
   async sendApi(senderPsid: any, response: any) {
