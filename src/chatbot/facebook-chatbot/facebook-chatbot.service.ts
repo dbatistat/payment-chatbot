@@ -1,6 +1,7 @@
 import { HttpException, HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { FacebookMessageDto } from './dto/FacebookMessage.dto';
 import { API_URL, TOKEN } from '../../commons/constants/constants';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class FacebookChatbotService {
@@ -84,7 +85,11 @@ export class FacebookChatbotService {
       };
     }
 
-    this.sendApi(senderPsid, response);
+    this.sendApi(senderPsid, response).subscribe(res => {
+      Logger.log(res, 'API_FACEBOOK_OK');
+    }, error => {
+      Logger.log(error, 'API_FACEBOOK_ERROR');
+    });
   }
 
   async handlePostback(senderPsid, receivedPostback) {
@@ -98,10 +103,14 @@ export class FacebookChatbotService {
       response = { text: 'Oops, try sending another image.' };
     }
 
-    this.sendApi(senderPsid, response);
+    this.sendApi(senderPsid, response).subscribe(res => {
+      Logger.log(res, 'API_FACEBOOK_OK');
+    }, error => {
+      Logger.log(error, 'API_FACEBOOK_ERROR');
+    });
   }
 
-  sendApi(senderPsid: any, response: any) {
+  sendApi(senderPsid: any, response: any): Observable<any> {
     const requestBody = {
       recipient: {
         id: senderPsid,
@@ -112,13 +121,9 @@ export class FacebookChatbotService {
     Logger.log(requestBody, 'REQUEST_BODY');
     Logger.log(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), 'REQUEST_URL');
 
-    this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
+    return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
       {
-        headers: [{ 'content-type': 'application/json' }, { 'Cache-Control': 'no-cache' }],
-      }).subscribe(res => {
-      Logger.log(res, 'API_FACEBOOK_OK');
-    }, error => {
-      Logger.log(error, 'API_FACEBOOK_ERROR');
-    });
+        headers: [{ 'content-type': 'application/json' }, {'Cache-Control' : 'no-cache'}],
+      });
   }
 }
