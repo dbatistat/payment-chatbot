@@ -84,11 +84,7 @@ export class FacebookChatbotService {
       };
     }
 
-    this.sendApi(senderPsid, response).then(res => {
-      Logger.log(res, 'API_FACEBOOK_OK');
-    }).catch(error => {
-      Logger.log(error, 'API_FACEBOOK_ERROR');
-    });
+    await this.sendApi(senderPsid, response);
   }
 
   async handlePostback(senderPsid, receivedPostback) {
@@ -102,11 +98,7 @@ export class FacebookChatbotService {
       response = { text: 'Oops, try sending another image.' };
     }
 
-    this.sendApi(senderPsid, response).then(res => {
-      Logger.log(res, 'API_FACEBOOK_OK');
-    }).catch(error => {
-      Logger.log(error, 'API_FACEBOOK_ERROR');
-    });
+    await this.sendApi(senderPsid, response);
   }
 
   async sendApi(senderPsid: any, response: any) {
@@ -120,9 +112,13 @@ export class FacebookChatbotService {
     Logger.log(requestBody, 'REQUEST_BODY');
     Logger.log(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), 'REQUEST_URL');
 
-    return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
+    this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
       {
-        headers: [{ 'content-type': 'application/json' }, {'Cache-Control' : 'no-cache'}],
-      });
+        headers: [{ 'content-type': 'application/json' }, { 'Cache-Control': 'no-cache' }],
+      }).subscribe(res => {
+      Logger.log(res, 'API_FACEBOOK_OK');
+    }, error => {
+      Logger.log(error, 'API_FACEBOOK_ERROR');
+    });
   }
 }
