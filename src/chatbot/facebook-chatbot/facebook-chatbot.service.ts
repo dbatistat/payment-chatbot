@@ -84,7 +84,7 @@ export class FacebookChatbotService {
       };
     }
 
-    await this.sendApi(senderPsid, response);
+    this.sendApi(senderPsid, response);
   }
 
   async handlePostback(senderPsid, receivedPostback) {
@@ -98,10 +98,10 @@ export class FacebookChatbotService {
       response = { text: 'Oops, try sending another image.' };
     }
 
-    await this.sendApi(senderPsid, response);
+    this.sendApi(senderPsid, response);
   }
 
-  async sendApi(senderPsid: any, response: any) {
+  sendApi(senderPsid: any, response: any) {
     const requestBody = {
       recipient: {
         id: senderPsid,
