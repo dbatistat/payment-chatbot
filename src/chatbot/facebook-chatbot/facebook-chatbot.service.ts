@@ -1,6 +1,6 @@
 import { HttpException, HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { FacebookMessageDto } from './dto/FacebookMessage.dto';
-import { TOKEN } from '../../commons/constants/constants';
+import { API_URL, TOKEN } from '../../commons/constants/constants';
 
 @Injectable()
 export class FacebookChatbotService {
@@ -119,9 +119,6 @@ export class FacebookChatbotService {
 
     Logger.log(requestBody, 'REQUEST_BODY');
 
-    return this.httpService.post('https://graph.facebook.com/v3.3/me/messages',
-      requestBody, {
-        params: { access_token: TOKEN.FACEBOOK },
-      });
+    return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK, requestBody);
   }
 }
