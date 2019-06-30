@@ -118,6 +118,7 @@ export class FacebookChatbotService {
     };
 
     Logger.log(requestBody, 'REQUEST_BODY');
+    Logger.log(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK, 'REQUEST_URL');
 
     return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK, requestBody);
   }
