@@ -1,38 +1,33 @@
-import { Controller, Get, Post, Query, Res, Logger, HttpStatus } from '@nestjs/common';
-import { TOKEN } from '../../commons/constants/constants';
+import { Controller, Get, HttpStatus, Logger, Post, Query, Res } from '@nestjs/common';
 import { Body } from '@nestjs/common/decorators/http/route-params.decorator';
 import { FacebookMessageDto } from './dto/FacebookMessage.dto';
+import { FacebookChatbotService } from './facebook-chatbot.service';
 
 @Controller('facebook_chatbot')
 export class FacebookChatbotController {
 
-  @Post()
-  webhook(@Body() data: FacebookMessageDto, @Res() response) {
-    if (data.object === 'page') {
-      data.entry.forEach(entry => {
-        const webhookEvent = entry.messaging[0];
-        Logger.log(webhookEvent);
-      });
+  constructor(private service: FacebookChatbotService) {
+  }
 
+  @Post()
+  async webhook(@Body() data: FacebookMessageDto, @Res() response) {
+    this.service.webhook(data).then(res => {
       response.status(HttpStatus.OK).send('EVENT_RECEIVED');
-    } else {
+    }).catch(error => {
       response.sendStatus(HttpStatus.NOT_FOUND);
-    }
+    });
   }
 
   @Get()
-  webhookVerification(@Query('hub.mode') mode: string,
-                      @Query('hub.verify_token') token: string,
-                      @Query('hub.challenge') challenge: string,
-                      @Res() response) {
-    if (mode && token) {
-      if (mode === 'subscribe' && token === TOKEN.APPLICATION) {
-        Logger.log('WEBHOOK_VERIFIED');
-        response.status(HttpStatus.OK).send(challenge);
-      } else {
-        response.sendStatus(HttpStatus.FORBIDDEN);
-      }
-    }
-    response.sendStatus(HttpStatus.FORBIDDEN);
+  async webhookVerification(@Query('hub.mode') mode: string,
+                            @Query('hub.verify_token') token: string,
+                            @Query('hub.challenge') challenge: string,
+                            @Res() response) {
+    this.service.webhookVerification(mode, token, challenge).then(res => {
+      Logger.log('WEBHOOK_VERIFIED');
+      response.status(HttpStatus.OK).send(challenge);
+    }).catch(error => {
+      response.sendStatus(HttpStatus.FORBIDDEN);
+    });
   }
 }
