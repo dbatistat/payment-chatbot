@@ -109,7 +109,7 @@ export class FacebookChatbotService {
       message: response,
     };
 
-    return this.httpService.post('https://graph.facebook.com/v2.6/me/messages',
+    return this.httpService.post('https://graph.facebook.com/v3.3/me/messages',
       requestBody, {
         headers: { access_token: TOKEN.FACEBOOK },
       });
