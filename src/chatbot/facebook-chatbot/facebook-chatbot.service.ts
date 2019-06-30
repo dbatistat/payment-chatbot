@@ -1,7 +1,7 @@
 import { HttpException, HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { FacebookMessageDto } from './dto/FacebookMessage.dto';
 import { API_URL, TOKEN } from '../../commons/constants/constants';
-import { Observable } from 'rxjs';
+import { MESSAGE } from './messages';
 
 @Injectable()
 export class FacebookChatbotService {
@@ -17,14 +17,14 @@ export class FacebookChatbotService {
     data.entry.forEach(entry => {
       const webhookEvent = entry.messaging[0];
 
-      const senderPsid = webhookEvent.sender.id;
-      Logger.log('Sender PSID: ' + senderPsid);
+      const senderId = webhookEvent.sender.id;
+      Logger.log('Sender PSID: ' + senderId);
       if (webhookEvent.message) {
         Logger.log(webhookEvent.message, 'Sender Message');
-        return this.handleMessage(senderPsid, webhookEvent.message);
+        return this.handleMessage(senderId, webhookEvent.message);
       } else if (webhookEvent.postback) {
         Logger.log(webhookEvent.postback, 'Sender POSTBACK');
-        // this.handlePostback(senderPsid, webhookEvent.postback);
+        this.handlePostback(senderId, webhookEvent.postback);
       }
     });
     return true;
@@ -48,64 +48,42 @@ export class FacebookChatbotService {
     return true;
   }
 
-  async handleMessage(senderPsid, receivedMessage) {
+  async handleMessage(senderId, receivedMessage) {
     let response;
 
     if (receivedMessage.text) {
       response = {
-        text: `You sent the message: '${receivedMessage.text}'. Now send me an attachment!`,
+        text: `Enviaste: '${receivedMessage.text}'. Now send me an attachment!`,
       };
-    } else if (receivedMessage.attachments) {
-
-      const attachmentUrl = receivedMessage.attachments[0].payload.url;
+    } else {
       response = {
-        attachment: {
-          type: 'template',
-          payload: {
-            template_type: 'generic',
-            elements: [{
-              title: 'Is this the right picture?',
-              subtitle: 'Tap a button to answer.',
-              image_url: attachmentUrl,
-              buttons: [
-                {
-                  type: 'postback',
-                  title: 'Yes!',
-                  payload: 'yes',
-                },
-                {
-                  type: 'postback',
-                  title: 'No!',
-                  payload: 'no',
-                },
-              ],
-            }],
-          },
-        },
+        text: `No entiendo que has dicho.`,
       };
     }
 
-    return this.sendApi(senderPsid, response);
+    return this.sendApi(senderId, response);
   }
 
-  async handlePostback(senderPsid, receivedPostback) {
+  async handlePostback(senderId, postBack) {
     let response;
 
-    const payload = receivedPostback.payload;
+    const payload = postBack.payload;
 
-    if (payload === 'yes') {
-      response = { text: 'Thanks!' };
+    if (payload === 'START') {
+      response = MESSAGE.START;
+    } else if (payload === 'yes') {
+      response = MESSAGE.GET_PHONE;
     } else if (payload === 'no') {
-      response = { text: 'Oops, try sending another image.' };
+      response = MESSAGE.NO_START;
     }
 
-    return this.sendApi(senderPsid, response);
+    return this.sendApi(senderId, response);
   }
 
-  async sendApi(senderPsid: any, response: any) {
+  async sendApi(senderId: any, response: any) {
     const requestBody = {
       recipient: {
-        id: senderPsid,
+        id: senderId,
       },
       message: response,
     };
@@ -115,11 +93,12 @@ export class FacebookChatbotService {
 
     this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
       {
-        headers: [{ 'content-type': 'application/json' }, {'Cache-Control' : 'no-cache'}],
+        headers: [{ 'content-type': 'application/json' }, { 'Cache-Control': 'no-cache' }],
       }).subscribe(res => {
       Logger.log(res, 'API_FACEBOOK_OK');
     }, error => {
       Logger.log(error, 'API_FACEBOOK_ERROR');
     });
   }
+
 }
