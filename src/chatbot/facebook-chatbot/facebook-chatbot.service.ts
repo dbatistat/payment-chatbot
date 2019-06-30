@@ -18,11 +18,11 @@ export class FacebookChatbotService {
 
       const senderPsid = webhookEvent.sender.id;
       Logger.log('Sender PSID: ' + senderPsid);
-      Logger.log( 'Sender Message' + webhookEvent.message);
+      Logger.log(webhookEvent.message, 'Sender Message');
       if (webhookEvent.message) {
         this.handleMessage(senderPsid, webhookEvent.message);
       } else if (webhookEvent.postback) {
-        Logger.log( 'Sender POSTBACK' + webhookEvent.postback);
+        Logger.log(webhookEvent.postback, 'Sender POSTBACK');
         // this.handlePostback(senderPsid, webhookEvent.postback);
       }
     });
@@ -85,9 +85,9 @@ export class FacebookChatbotService {
     }
 
     this.sendApi(senderPsid, response).then(res => {
-      Logger.log(res, 'API_FACEBOOK');
+      Logger.log(res, 'API_FACEBOOK_OK');
     }).catch(error => {
-      Logger.log(error, 'API_FACEBOOK');
+      Logger.log(error, 'API_FACEBOOK_ERROR');
     });
   }
 
@@ -103,9 +103,9 @@ export class FacebookChatbotService {
     }
 
     this.sendApi(senderPsid, response).then(res => {
-      Logger.log(res, 'API_FACEBOOK');
+      Logger.log(res, 'API_FACEBOOK_OK');
     }).catch(error => {
-      Logger.log(error, 'API_FACEBOOK');
+      Logger.log(error, 'API_FACEBOOK_ERROR');
     });
   }
 
