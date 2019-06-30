@@ -19,8 +19,8 @@ export class FacebookChatbotService {
 
       const senderPsid = webhookEvent.sender.id;
       Logger.log('Sender PSID: ' + senderPsid);
-      Logger.log(webhookEvent.message, 'Sender Message');
       if (webhookEvent.message) {
+        Logger.log(webhookEvent.message, 'Sender Message');
         return this.handleMessage(senderPsid, webhookEvent.message);
       } else if (webhookEvent.postback) {
         Logger.log(webhookEvent.postback, 'Sender POSTBACK');
