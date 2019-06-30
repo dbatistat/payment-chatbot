@@ -120,6 +120,9 @@ export class FacebookChatbotService {
     Logger.log(requestBody, 'REQUEST_BODY');
     Logger.log(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), 'REQUEST_URL');
 
-    return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody);
+    return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
+      {
+        headers: [{ 'content-type': 'application/json' }, {'Cache-Control' : 'no-cache'}],
+      });
   }
 }
