@@ -21,7 +21,7 @@ export class FacebookChatbotService {
       Logger.log('Sender PSID: ' + senderPsid);
       Logger.log(webhookEvent.message, 'Sender Message');
       if (webhookEvent.message) {
-        this.handleMessage(senderPsid, webhookEvent.message);
+        return this.handleMessage(senderPsid, webhookEvent.message);
       } else if (webhookEvent.postback) {
         Logger.log(webhookEvent.postback, 'Sender POSTBACK');
         // this.handlePostback(senderPsid, webhookEvent.postback);
@@ -85,11 +85,7 @@ export class FacebookChatbotService {
       };
     }
 
-    this.sendApi(senderPsid, response).subscribe(res => {
-      Logger.log(res, 'API_FACEBOOK_OK');
-    }, error => {
-      Logger.log(error, 'API_FACEBOOK_ERROR');
-    });
+    return this.sendApi(senderPsid, response);
   }
 
   async handlePostback(senderPsid, receivedPostback) {
@@ -103,14 +99,10 @@ export class FacebookChatbotService {
       response = { text: 'Oops, try sending another image.' };
     }
 
-    this.sendApi(senderPsid, response).subscribe(res => {
-      Logger.log(res, 'API_FACEBOOK_OK');
-    }, error => {
-      Logger.log(error, 'API_FACEBOOK_ERROR');
-    });
+    return this.sendApi(senderPsid, response);
   }
 
-  sendApi(senderPsid: any, response: any): Observable<any> {
+  async sendApi(senderPsid: any, response: any) {
     const requestBody = {
       recipient: {
         id: senderPsid,
@@ -121,9 +113,13 @@ export class FacebookChatbotService {
     Logger.log(requestBody, 'REQUEST_BODY');
     Logger.log(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), 'REQUEST_URL');
 
-    return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
+    this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
       {
         headers: [{ 'content-type': 'application/json' }, {'Cache-Control' : 'no-cache'}],
-      });
+      }).subscribe(res => {
+      Logger.log(res, 'API_FACEBOOK_OK');
+    }, error => {
+      Logger.log(error, 'API_FACEBOOK_ERROR');
+    });
   }
 }
