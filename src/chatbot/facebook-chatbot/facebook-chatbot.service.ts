@@ -9,23 +9,24 @@ export class FacebookChatbotService {
   }
 
   async webhook(data: FacebookMessageDto) {
-    Logger.log(data, 'WEBHOOK DATA');
-    if (data.object === 'page') {
-      data.entry.forEach(entry => {
-        const webhookEvent = entry.messaging[0];
-        Logger.log(webhookEvent, 'WEBHOOK');
-
-        const senderPsid = webhookEvent.sender.id;
-        Logger.log('Sender PSID: ' + senderPsid);
-        if (webhookEvent.message) {
-          this.handleMessage(senderPsid, webhookEvent.message);
-        } else if (webhookEvent.postback) {
-          this.handlePostback(senderPsid, webhookEvent.postback);
-        }
-      });
-      return true;
+    if (data.object !== 'page') {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
-    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+
+    data.entry.forEach(entry => {
+      const webhookEvent = entry.messaging[0];
+
+      const senderPsid = webhookEvent.sender.id;
+      Logger.log('Sender PSID: ' + senderPsid);
+      Logger.log( 'Sender Message' + webhookEvent.message);
+      if (webhookEvent.message) {
+        this.handleMessage(senderPsid, webhookEvent.message);
+      } else if (webhookEvent.postback) {
+        Logger.log( 'Sender POSTBACK' + webhookEvent.postback);
+        // this.handlePostback(senderPsid, webhookEvent.postback);
+      }
+    });
+    return true;
   }
 
   async webhookVerification(mode: string,
