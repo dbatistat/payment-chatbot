@@ -1,0 +1,4 @@
+export const TOKEN = {
+  APPLICATION: process.env.VERIFICATION_TOKEN,
+  FACEBOOK: process.env.FACEBOOK_VERIFICATION_TOKEN,
+};
