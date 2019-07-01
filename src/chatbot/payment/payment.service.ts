@@ -42,9 +42,9 @@ export class PaymentService {
   }
 
   async registerAmount(registerNumberDto: PaymentRegisterAmountDto) {
-    // const payment = await this.paymentRepository.findOne({ where: { facebookId: registerNumberDto.facebookId } });
-    // payment.amount = registerNumberDto.amount;
-    // payment.paymentStep = PaymentStep.SUCCESSFUL;
-    // return this.paymentRepository.save(payment);
+    const payment = await this.paymentRepository.findOne({ where: { facebookId: registerNumberDto.facebookId } });
+    payment.amount = registerNumberDto.amount;
+    payment.paymentStep = PaymentStep.SUCCESSFUL;
+    return this.paymentRepository.save(payment);
   }
 }
