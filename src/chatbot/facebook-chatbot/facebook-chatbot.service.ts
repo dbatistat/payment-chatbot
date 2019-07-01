@@ -2,6 +2,7 @@ import { HttpException, HttpService, HttpStatus, Injectable, Logger } from '@nes
 import { FacebookMessageDto } from './dto/FacebookMessage.dto';
 import { API_URL, TOKEN } from '../../commons/constants/constants';
 import { MESSAGE } from './messages';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class FacebookChatbotService {
@@ -21,7 +22,7 @@ export class FacebookChatbotService {
       Logger.log('Sender PSID: ' + senderId);
       if (webhookEvent.message) {
         Logger.log(webhookEvent.message, 'Sender Message');
-        return this.handleMessage(senderId, webhookEvent.message);
+        this.handleMessage(senderId, webhookEvent.message);
       } else if (webhookEvent.postback) {
         Logger.log(webhookEvent.postback, 'Sender POSTBACK');
         this.handlePostback(senderId, webhookEvent.postback);
@@ -61,7 +62,7 @@ export class FacebookChatbotService {
       };
     }
 
-    return this.sendApi(senderId, response);
+    await this.sendApi(senderId, response);
   }
 
   async handlePostback(senderId, postBack) {
@@ -77,10 +78,10 @@ export class FacebookChatbotService {
       response = MESSAGE.NO_START;
     }
 
-    return this.sendApi(senderId, response);
+    await this.sendApi(senderId, response);
   }
 
-  async sendApi(senderId: any, response: any) {
+  sendApi(senderId: any, response: any): Promise<AxiosResponse> {
     const requestBody = {
       recipient: {
         id: senderId,
@@ -91,14 +92,10 @@ export class FacebookChatbotService {
     Logger.log(requestBody, 'REQUEST_BODY');
     Logger.log(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), 'REQUEST_URL');
 
-    this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
+    return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
       {
         headers: [{ 'content-type': 'application/json' }, { 'Cache-Control': 'no-cache' }],
-      }).subscribe(res => {
-      Logger.log(res, 'API_FACEBOOK_OK');
-    }, error => {
-      Logger.log(error, 'API_FACEBOOK_ERROR');
-    });
+      }).toPromise();
   }
 
 }
