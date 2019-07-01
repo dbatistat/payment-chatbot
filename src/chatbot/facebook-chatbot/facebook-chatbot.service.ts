@@ -79,7 +79,7 @@ export class FacebookChatbotService {
         await this.paymentService.registerNew({ facebookId: senderId, date: new Date() });
       }
     } else if (payload === 'yes') {
-      response = MESSAGE.START;
+      response = MESSAGE.GET_PHONE;
       await this.paymentService.registerStart({ facebookId: senderId });
     } else if (payload === 'no') {
       response = MESSAGE.NO_START;
