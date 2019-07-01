@@ -5,10 +5,8 @@ import { TWILIO } from '../../commons/constants/constants';
 @Injectable()
 export class TwilioSmsService {
 
-  async sendMessage(phoneNumber: string) {
+  async sendMessage(phoneNumber: string, message: string) {
     const client = new Twilio(TWILIO.ACCOUNT_ID, TWILIO.AUTH_TOKEN);
-
-    const phoneNumbers = ['phone-number-1', 'phone-number-2'];
 
     Logger.log(phoneNumber, 'TWILIO');
 
@@ -17,13 +15,13 @@ export class TwilioSmsService {
     }
 
     const textContent = {
-      body: `You have a new sms from Dale Nguyen :)`,
+      body: message,
       to: phoneNumber,
       from: TWILIO.NUMBER,
     };
 
     client.messages.create(textContent)
-      .then((message) => Logger.log(message.to));
+      .then(msg => Logger.log(msg.to));
 
     return true;
   }

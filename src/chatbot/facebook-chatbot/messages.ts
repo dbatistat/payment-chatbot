@@ -34,10 +34,7 @@ export const MESSAGE = {
   GET_AMOUNT: {
     text: 'Introduce el monto que quiere enviar (BOB)',
   },
-  GET_CONFIRMATION_PHONE: {
-    text: 'Introduce tu número telefónica para confirmar el pago.',
-  },
   PAYMENT_SUCCESSFUL: {
-    text: 'El pago ha sido confirmado correctamente. ¿Deseas realizar otro pago?',
+    text: 'El pago ha sido confirmado correctamente. Si desea realizar otro pago escribe "Empezar".',
   },
 };

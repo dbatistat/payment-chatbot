@@ -4,12 +4,18 @@ import { API_URL, TOKEN } from '../../commons/constants/constants';
 import { MESSAGE } from './messages';
 import { AxiosResponse } from 'axios';
 import { TwilioSmsService } from '../twilio/twilio-sms.service';
+import { PaymentService } from '../payment/payment.service';
+import { PaymentEntity } from '../payment/payment.entity';
+import { PaymentStep } from '../payment/payment-step';
+
+const START = 'EMPEZAR';
 
 @Injectable()
 export class FacebookChatbotService {
 
   constructor(private readonly httpService: HttpService,
-              private readonly twilioService: TwilioSmsService) {
+              private readonly twilioService: TwilioSmsService,
+              private readonly paymentService: PaymentService) {
   }
 
   async webhook(data: FacebookMessageDto) {
@@ -54,28 +60,9 @@ export class FacebookChatbotService {
   }
 
   async handleMessage(senderId, receivedMessage) {
-    const response = await this.getMessage(receivedMessage);
+    const response = await this.getMessage(senderId, receivedMessage);
 
     await this.sendApi(senderId, response);
-  }
-
-  private async getMessage(receivedMessage) {
-    if (!receivedMessage.text) {
-      return {
-        text: `No entiendo lo que intentas decirme`,
-      };
-    }
-
-    if (this.twilioService.validE164(receivedMessage.text)) {
-      await this.twilioService.sendMessage(receivedMessage.text);
-      return {
-        text: `Enviaste un SMS a: '${receivedMessage.text}'.`,
-      };
-    }
-
-    return {
-      text: `Enviaste: '${receivedMessage.text}'. Now send me an attachment!`,
-    };
   }
 
   async handlePostback(senderId, postBack) {
@@ -84,9 +71,16 @@ export class FacebookChatbotService {
     const payload = postBack.payload;
 
     if (payload === 'START') {
-      response = MESSAGE.START;
+      const payment = await this.paymentService.existAValidPayment({ facebookId: senderId });
+      if (payment) {
+        response = this.getPaymentMessage(payment);
+      } else {
+        response = MESSAGE.START;
+        await this.paymentService.registerNew({ facebookId: senderId, date: new Date() });
+      }
     } else if (payload === 'yes') {
       response = MESSAGE.GET_PHONE;
+      await this.paymentService.registerStart({ facebookId: senderId });
     } else if (payload === 'no') {
       response = MESSAGE.NO_START;
     }
@@ -111,4 +105,58 @@ export class FacebookChatbotService {
       }).toPromise();
   }
 
+  private async getMessage(senderId, receivedMessage) {
+    if (!receivedMessage.text) {
+      return {
+        text: `No entiendo lo que intentas decirme`,
+      };
+    }
+
+    const value = receivedMessage.text;
+
+    if (receivedMessage.text.toUpperCase() === START) {
+      return MESSAGE.START;
+    }
+
+    const payment = await this.paymentService.existAValidPayment({ facebookId: senderId });
+
+    if (payment.paymentStep === PaymentStep.NUMBER) {
+      if (this.twilioService.validE164(value)) {
+        await this.paymentService.registerNumber({ facebookId: senderId, number: value });
+        return MESSAGE.GET_AMOUNT;
+      } else {
+        return {
+          text: 'Por favor, escribe un número de celular correcto.',
+        };
+      }
+    }
+
+    if (payment.paymentStep === PaymentStep.AMOUNT) {
+      if (Number(value)) {
+        await this.paymentService.registerAmount({ facebookId: senderId, amount: Number(value) });
+        await this.twilioService.sendMessage(payment.paymentPhoneNumber, 'Se ha transferido ' + value + ' a su cuenta.');
+        return MESSAGE.PAYMENT_SUCCESSFUL;
+      } else {
+        return {
+          text: 'Por favor, escribe un monto correcto.',
+        };
+      }
+    }
+
+    return MESSAGE.NO_START;
+  }
+
+  private async getPaymentMessage(payment: PaymentEntity) {
+    if (payment.paymentStep === PaymentStep.STARTED) {
+      return MESSAGE.GET_PHONE;
+    }
+
+    if (payment.paymentStep === PaymentStep.NUMBER) {
+      return MESSAGE.GET_AMOUNT;
+    }
+
+    if (payment.paymentStep === PaymentStep.AMOUNT) {
+      return MESSAGE.NO_START;
+    }
+  }
 }
