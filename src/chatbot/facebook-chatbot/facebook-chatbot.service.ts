@@ -3,13 +3,13 @@ import { FacebookMessageDto } from './dto/FacebookMessage.dto';
 import { API_URL, TOKEN } from '../../commons/constants/constants';
 import { MESSAGE } from './messages';
 import { AxiosResponse } from 'axios';
-import { TwilioService } from '../twilio/twilio.service';
+import { TwilioSmsService } from '../twilio/twilio-sms.service';
 
 @Injectable()
 export class FacebookChatbotService {
 
   constructor(private readonly httpService: HttpService,
-              private readonly twilioService: TwilioService) {
+              private readonly twilioService: TwilioSmsService) {
   }
 
   async webhook(data: FacebookMessageDto) {

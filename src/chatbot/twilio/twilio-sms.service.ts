@@ -3,7 +3,7 @@ import Twilio = require('twilio/lib/rest/Twilio');
 import { TWILIO } from '../../commons/constants/constants';
 
 @Injectable()
-export class TwilioService {
+export class TwilioSmsService {
 
   async sendMessage(phoneNumber: string) {
     const client = new Twilio(TWILIO.ACCOUNT_ID, TWILIO.AUTH_TOKEN);
