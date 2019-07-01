@@ -5,7 +5,7 @@ import { MESSAGE } from './messages';
 import { AxiosResponse } from 'axios';
 import { TwilioSmsService } from '../twilio/twilio-sms.service';
 import { PaymentService } from '../payment/payment.service';
-import { PaymentEntity } from '../payment/payment.entity';
+import { PaymentEntity } from '../payment/entities/payment.entity';
 import { PaymentStep } from '../payment/payment-step';
 
 const START = 'EMPEZAR';

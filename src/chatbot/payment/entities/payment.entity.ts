@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { PaymentStep } from './payment-step';
+import { PaymentStep } from '../payment-step';
 
-@Entity({ name: 'clients' })
+@Entity({name: 'payment'})
 export class PaymentEntity {
   @PrimaryGeneratedColumn()
   id: number;

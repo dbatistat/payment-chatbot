@@ -8,7 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [TypeOrmModule.forRoot({
     type: 'mysql',
-    name: 'payment_chatbot',
+    name: 'chatbot',
     host: environment.TYPEORM_HOST,
     port: environment.TYPEORM_PORT,
     username: environment.TYPEORM_USERNAME,

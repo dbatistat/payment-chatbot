@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { PaymentEntity } from './payment.entity';
 import { PaymentRegisterNewDto } from './dto/payment-register-new.dto';
-import { PaymentStep } from './payment-step';
 import { PaymentRegisterNumberDto } from './dto/payment-register-number.dto';
 import { PaymentRegisterAmountDto } from './dto/payment-register-amount.dto';
 import { PaymentSearchDto } from './dto/payment-search.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PaymentStep } from './payment-step';
+import { PaymentEntity } from './entities/payment.entity';
 
 @Injectable()
 export class PaymentService {
   constructor(@InjectRepository(PaymentEntity)
-              private readonly paymentRepository: Repository<PaymentEntity>) {
+              private readonly paymentRepository: Repository<PaymentEntity>,
+  ) {
   }
 
   async existAValidPayment(paymentDto: PaymentSearchDto) {
@@ -41,9 +42,9 @@ export class PaymentService {
   }
 
   async registerAmount(registerNumberDto: PaymentRegisterAmountDto) {
-    const payment = await this.paymentRepository.findOne({ where: { facebookId: registerNumberDto.facebookId } });
-    payment.amount = registerNumberDto.amount;
-    payment.paymentStep = PaymentStep.SUCCESSFUL;
-    return this.paymentRepository.save(payment);
+    // const payment = await this.paymentRepository.findOne({ where: { facebookId: registerNumberDto.facebookId } });
+    // payment.amount = registerNumberDto.amount;
+    // payment.paymentStep = PaymentStep.SUCCESSFUL;
+    // return this.paymentRepository.save(payment);
   }
 }

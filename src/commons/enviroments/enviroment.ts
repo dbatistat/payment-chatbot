@@ -8,6 +8,6 @@ export const environment = {
   TYPEORM_USERNAME: 'chatbot',
   TYPEORM_PASSWORD: 'P@ssw0rd',
   TYPEORM_DATABASE: 'payment_chatbot',
-  TYPEORM_SYNCHRONIZE: false,
+  TYPEORM_SYNCHRONIZE: true,
   TYPEORM_ENTITIES: '/**/*.entity{.ts,.js}',
 };
