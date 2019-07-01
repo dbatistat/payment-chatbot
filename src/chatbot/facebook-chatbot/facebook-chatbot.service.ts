@@ -59,13 +59,13 @@ export class FacebookChatbotService {
     return true;
   }
 
-  async handleMessage(senderId, receivedMessage) {
+  private async handleMessage(senderId, receivedMessage) {
     const response = await this.getMessage(senderId, receivedMessage);
 
     return this.sendApi(senderId, response);
   }
 
-  async handlePostback(senderId, postBack) {
+  private async handlePostback(senderId, postBack) {
     let response;
 
     const payload = postBack.payload;
@@ -79,7 +79,7 @@ export class FacebookChatbotService {
         await this.paymentService.registerNew({ facebookId: senderId, date: new Date() });
       }
     } else if (payload === 'yes') {
-      response = MESSAGE.GET_PHONE;
+      response = MESSAGE.START;
       await this.paymentService.registerStart({ facebookId: senderId });
     } else if (payload === 'no') {
       response = MESSAGE.NO_START;
