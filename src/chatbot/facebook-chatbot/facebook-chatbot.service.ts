@@ -148,6 +148,7 @@ export class FacebookChatbotService {
 
   private async getPaymentMessage(payment: PaymentEntity) {
     if (payment.paymentStep === PaymentStep.STARTED) {
+      this.paymentService.registerStart({ facebookId: payment.facebookId }).catch(error => Logger.error(error));
       return MESSAGE.GET_PHONE;
     }
 
