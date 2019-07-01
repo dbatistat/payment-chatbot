@@ -32,10 +32,10 @@ export class FacebookChatbotService {
       Logger.log(webhookEvent, 'Event Sender Message');
       if (webhookEvent.message) {
         Logger.log(webhookEvent.message, 'Sender Message');
-        this.handleMessage(senderId, webhookEvent.message).catch(error => Logger.error(error));
+        return this.handleMessage(senderId, webhookEvent.message).catch(error => Logger.error(error));
       } else if (webhookEvent.postback) {
         Logger.log(webhookEvent.postback, 'Sender POSTBACK');
-        this.handlePostback(senderId, webhookEvent.postback).catch(error => Logger.error(error));
+        return this.handlePostback(senderId, webhookEvent.postback).catch(error => Logger.error(error));
       }
     });
     return true;
@@ -62,7 +62,7 @@ export class FacebookChatbotService {
   async handleMessage(senderId, receivedMessage) {
     const response = await this.getMessage(senderId, receivedMessage);
 
-    await this.sendApi(senderId, response);
+    return this.sendApi(senderId, response);
   }
 
   async handlePostback(senderId, postBack) {
@@ -73,7 +73,7 @@ export class FacebookChatbotService {
     if (payload === 'START') {
       const payment = await this.paymentService.existAValidPayment({ facebookId: senderId });
       if (payment) {
-        response = this.getPaymentMessage(payment);
+        response = await this.getPaymentMessage(payment).catch(error => Logger.error(error));
       } else {
         response = MESSAGE.START;
         await this.paymentService.registerNew({ facebookId: senderId, date: new Date() });
@@ -85,7 +85,7 @@ export class FacebookChatbotService {
       response = MESSAGE.NO_START;
     }
 
-    await this.sendApi(senderId, response);
+    return this.sendApi(senderId, response);
   }
 
   sendApi(senderId: any, response: any): Promise<AxiosResponse> {
