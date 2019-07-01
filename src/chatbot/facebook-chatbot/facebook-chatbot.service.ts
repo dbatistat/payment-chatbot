@@ -20,6 +20,7 @@ export class FacebookChatbotService {
 
       const senderId = webhookEvent.sender.id;
       Logger.log('Sender PSID: ' + senderId);
+      Logger.log(webhookEvent, 'Event Sender Message');
       if (webhookEvent.message) {
         Logger.log(webhookEvent.message, 'Sender Message');
         this.handleMessage(senderId, webhookEvent.message);
