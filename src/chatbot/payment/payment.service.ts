@@ -17,7 +17,7 @@ export class PaymentService {
 
   async existAValidPayment(paymentDto: PaymentSearchDto) {
     const payment = await this.paymentRepository.findOne({ where: { facebookId: paymentDto.facebookId } });
-    return payment.paymentStep === PaymentStep.SUCCESSFUL ? null : payment;
+    return payment ? payment.paymentStep === PaymentStep.SUCCESSFUL ? null : payment : null;
   }
 
   async registerNew(registerNewDto: PaymentRegisterNewDto) {
