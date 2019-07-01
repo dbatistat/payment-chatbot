@@ -14,6 +14,7 @@ export class FacebookChatbotService {
     if (data.object !== 'page') {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
+    Logger.log(data, 'DATA_APPLICATION');
 
     data.entry.forEach(entry => {
       const webhookEvent = entry.messaging[0];
