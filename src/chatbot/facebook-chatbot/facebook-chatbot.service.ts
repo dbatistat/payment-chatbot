@@ -32,10 +32,10 @@ export class FacebookChatbotService {
       Logger.log(webhookEvent, 'Event Sender Message');
       if (webhookEvent.message) {
         Logger.log(webhookEvent.message, 'Sender Message');
-        this.handleMessage(senderId, webhookEvent.message);
+        this.handleMessage(senderId, webhookEvent.message).catch(error => Logger.error(error));
       } else if (webhookEvent.postback) {
         Logger.log(webhookEvent.postback, 'Sender POSTBACK');
-        this.handlePostback(senderId, webhookEvent.postback);
+        this.handlePostback(senderId, webhookEvent.postback).catch(error => Logger.error(error));
       }
     });
     return true;

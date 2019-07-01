@@ -5,12 +5,11 @@ import { FacebookChatbotController } from './facebook-chatbot/facebook-chatbot.c
 import { FacebookChatbotService } from './facebook-chatbot/facebook-chatbot.service';
 import { TwilioSmsService } from './twilio/twilio-sms.service';
 import { PaymentService } from './payment/payment.service';
-import { TestEntity } from './payment/entities/test.entity';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([PaymentEntity, TestEntity], 'chatbot')
+    TypeOrmModule.forFeature([PaymentEntity], 'chatbot')
   ],
   controllers: [FacebookChatbotController],
   providers: [PaymentService, FacebookChatbotService, TwilioSmsService],
