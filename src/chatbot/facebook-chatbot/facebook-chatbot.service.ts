@@ -1,7 +1,7 @@
 import { HttpException, HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { FacebookMessageDto } from './dto/FacebookMessage.dto';
 import { API_URL, TOKEN } from '../../commons/constants/constants';
-import { MESSAGE } from './messages';
+import { MESSAGE } from '../../commons/constants/messages';
 import { AxiosResponse } from 'axios';
 import { TwilioSmsService } from '../twilio/twilio-sms.service';
 import { PaymentService } from '../payment/payment.service';
@@ -28,13 +28,9 @@ export class FacebookChatbotService {
       const webhookEvent = entry.messaging[0];
 
       const senderId = webhookEvent.sender.id;
-      Logger.log('Sender PSID: ' + senderId);
-      Logger.log(webhookEvent, 'Event Sender Message');
       if (webhookEvent.message) {
-        Logger.log(webhookEvent.message, 'Sender Message');
         return this.handleMessage(senderId, webhookEvent.message).catch(error => Logger.error(error));
       } else if (webhookEvent.postback) {
-        Logger.log(webhookEvent.postback, 'Sender POSTBACK');
         return this.handlePostback(senderId, webhookEvent.postback).catch(error => Logger.error(error));
       }
     });
@@ -52,10 +48,6 @@ export class FacebookChatbotService {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
 
-    Logger.log('WEBHOOK_VERIFIED', 'VERIFICATION');
-    Logger.log('MODE: ' + mode, 'VERIFICATION');
-    Logger.log('TOKEN: ' + token, 'VERIFICATION');
-    Logger.log('CHALLENGE: ' + challenge, 'VERIFICATION');
     return true;
   }
 
@@ -95,9 +87,6 @@ export class FacebookChatbotService {
       },
       message: response,
     };
-
-    Logger.log(requestBody, 'REQUEST_BODY');
-    Logger.log(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), 'REQUEST_URL');
 
     return this.httpService.post(API_URL.FACEBOOK + 'messages?access_token=' + TOKEN.FACEBOOK.trim(), requestBody,
       {

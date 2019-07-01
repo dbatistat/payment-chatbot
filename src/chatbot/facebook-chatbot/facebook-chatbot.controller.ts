@@ -24,7 +24,6 @@ export class FacebookChatbotController {
                             @Query('hub.challenge') challenge: string,
                             @Res() response) {
     this.service.webhookVerification(mode, token, challenge).then(res => {
-      Logger.log('WEBHOOK_VERIFIED');
       response.status(HttpStatus.OK).send(challenge);
     }).catch(error => {
       response.sendStatus(HttpStatus.FORBIDDEN);
