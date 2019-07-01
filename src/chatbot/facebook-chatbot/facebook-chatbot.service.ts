@@ -3,11 +3,13 @@ import { FacebookMessageDto } from './dto/FacebookMessage.dto';
 import { API_URL, TOKEN } from '../../commons/constants/constants';
 import { MESSAGE } from './messages';
 import { AxiosResponse } from 'axios';
+import { TwilioService } from '../twilio/twilio.service';
 
 @Injectable()
 export class FacebookChatbotService {
 
-  constructor(private readonly httpService: HttpService) {
+  constructor(private readonly httpService: HttpService,
+              private readonly twilioService: TwilioService) {
   }
 
   async webhook(data: FacebookMessageDto) {
@@ -52,19 +54,28 @@ export class FacebookChatbotService {
   }
 
   async handleMessage(senderId, receivedMessage) {
-    let response;
+    const response = await this.getMessage(receivedMessage);
 
-    if (receivedMessage.text) {
-      response = {
-        text: `Enviaste: '${receivedMessage.text}'. Now send me an attachment!`,
-      };
-    } else {
-      response = {
-        text: `No entiendo que has dicho.`,
+    await this.sendApi(senderId, response);
+  }
+
+  private async getMessage(receivedMessage) {
+    if (!receivedMessage.text) {
+      return {
+        text: `No entiendo lo que intentas decirme`,
       };
     }
 
-    await this.sendApi(senderId, response);
+    if (this.twilioService.validE164(receivedMessage.text)) {
+      await this.twilioService.sendMessage(receivedMessage.text);
+      return {
+        text: `Enviaste un SMS a: '${receivedMessage.text}'.`,
+      };
+    }
+
+    return {
+      text: `Enviaste: '${receivedMessage.text}'. Now send me an attachment!`,
+    };
   }
 
   async handlePostback(senderId, postBack) {
